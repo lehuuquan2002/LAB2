@@ -90,6 +90,9 @@ const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer[4] = {1, 2, 3, 4};
 
+
+int hour = 15, minute = 8, second = 50;
+
 int status_dot = 0;
 
 void update7SEG(int index)
@@ -128,6 +131,14 @@ void update7SEG(int index)
 	}
 }
 
+void updateClockBuffer(void)
+{
+	led_buffer[0] = hour/10;
+	led_buffer[1] = hour%10;
+	led_buffer[2] = minute/10;
+	led_buffer[3] = minute%10;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -164,6 +175,7 @@ int main(void)
 	setTimer(1, 100);
 	HAL_TIM_Base_Start_IT(&htim2);
 	index_led = 1;
+	updateClockBuffer();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
