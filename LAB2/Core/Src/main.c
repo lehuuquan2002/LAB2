@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "soft_timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,6 +56,37 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int NUM [10][7]=
+{
+	{0,0,0,0,0,0,1},
+	{1,0,0,1,1,1,1},
+	{0,0,1,0,0,1,0},
+	{0,0,0,0,1,1,0},
+	{1,0,0,1,1,0,0},
+	{0,1,0,0,1,0,0},
+	{0,1,0,0,0,0,0},
+	{0,0,0,1,1,1,1},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,1,0,0}
+};
+
+void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim )
+{
+	runTimer();
+}
+
+void display7SEG(int num)
+{
+	HAL_GPIO_WritePin(SEG0_GPIO_Port, SEG0_Pin, NUM[num][0]);
+	HAL_GPIO_WritePin(SEG1_GPIO_Port, SEG1_Pin, NUM[num][1]);
+	HAL_GPIO_WritePin(SEG2_GPIO_Port, SEG2_Pin, NUM[num][2]);
+	HAL_GPIO_WritePin(SEG3_GPIO_Port, SEG3_Pin, NUM[num][3]);
+	HAL_GPIO_WritePin(SEG4_GPIO_Port, SEG4_Pin, NUM[num][4]);
+	HAL_GPIO_WritePin(SEG5_GPIO_Port, SEG5_Pin, NUM[num][5]);
+	HAL_GPIO_WritePin(SEG6_GPIO_Port, SEG6_Pin, NUM[num][6]);
+}
+
+int status = 0;
 
 /* USER CODE END 0 */
 
@@ -89,7 +120,8 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-
+  setTimer(0, 100);
+  HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -97,7 +129,21 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	  if (status)
+	  {
+		  display7SEG(2);
+	  }else{
+		  display7SEG(1);
+	  }
 
+	  HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, status);
+	  HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, !status);
+
+	  if (getTimerFlag(0))
+	  {
+		  status = !status;
+		  setTimer(0, 100);
+	  }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -160,7 +206,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 7999;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 65535;
+  htim2.Init.Period = 9;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -203,8 +249,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, LED_Pin|EN0_Pin|EN1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, SEG0_Pin|SEG1_Pin|SEG3_Pin|SEG4_Pin
-                          |SEG5_Pin|SEG6_Pin|SEG7_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, SEG0_Pin|SEG1_Pin|SEG2_Pin|SEG3_Pin
+                          |SEG4_Pin|SEG5_Pin|SEG6_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : LED_Pin EN0_Pin EN1_Pin */
   GPIO_InitStruct.Pin = LED_Pin|EN0_Pin|EN1_Pin;
@@ -213,10 +259,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SEG0_Pin SEG1_Pin SEG3_Pin SEG4_Pin
-                           SEG5_Pin SEG6_Pin SEG7_Pin */
-  GPIO_InitStruct.Pin = SEG0_Pin|SEG1_Pin|SEG3_Pin|SEG4_Pin
-                          |SEG5_Pin|SEG6_Pin|SEG7_Pin;
+  /*Configure GPIO pins : SEG0_Pin SEG1_Pin SEG2_Pin SEG3_Pin
+                           SEG4_Pin SEG5_Pin SEG6_Pin */
+  GPIO_InitStruct.Pin = SEG0_Pin|SEG1_Pin|SEG2_Pin|SEG3_Pin
+                          |SEG4_Pin|SEG5_Pin|SEG6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
