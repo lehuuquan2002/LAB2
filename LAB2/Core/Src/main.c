@@ -94,6 +94,7 @@ int led_buffer[4] = {1, 2, 3, 4};
 int hour = 15, minute = 8, second = 50;
 
 int status_dot = 0;
+int status_led = 0;
 
 void update7SEG(int index)
 {
@@ -171,11 +172,10 @@ int main(void)
 	MX_GPIO_Init();
 	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
-	setTimer(0, 25);
-	setTimer(1, 100);
+
+	setTimer(0, 1000);
 	HAL_TIM_Base_Start_IT(&htim2);
-	index_led = 1;
-	updateClockBuffer();
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -184,22 +184,12 @@ int main(void)
 	{
 	/* USER CODE END WHILE */
 
-	  update7SEG(index_led);
-	  HAL_GPIO_WritePin(DOT_GPIO_Port, DOT_Pin, status_dot);
+	  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, status_led);
+
 	  if (getTimerFlag(0))
 	  {
-		  index_led++;
-		  if (index_led > 4)
-		  {
-			  index_led = 1;
-		  }
-		  setTimer(0, 25);
-	  }
-
-	  if (getTimerFlag(1))
-	  {
-		  status_dot = !status_dot;
-		  setTimer(1, 100);
+		  status_led = !status_led;
+		  setTimer(0, 1000);
 	  }
 	/* USER CODE BEGIN 3 */
 	}
