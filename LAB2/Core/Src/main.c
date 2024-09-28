@@ -184,13 +184,43 @@ int main(void)
 	{
 	/* USER CODE END WHILE */
 
+	  if (second >= 60){
+		 second = 0;
+		 minute++;
+	  }
+
+	  if(minute >= 60){
+		 minute = 0;
+		 hour++;
+	  }
+	  if(hour >=24){
+		 hour = 0;
+	  }
 	  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, status_led);
+	  HAL_GPIO_WritePin(DOT_GPIO_Port, DOT_Pin, status_led);
+	  updateClockBuffer();
+	  update7SEG(index_led);
+
 
 	  if (getTimerFlag(0))
 	  {
 		  status_led = !status_led;
+		  status_dot = !status_dot;
+		  second++;
 		  setTimer(0, 1000);
 	  }
+
+	  if (getTimerFlag(1))
+	  {
+		  index_led++;
+		  if(index_led > 4)
+		  {
+			  index_led = 1;
+		  }
+		  setTimer(1, 250);
+	  }
+
+
 	/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
