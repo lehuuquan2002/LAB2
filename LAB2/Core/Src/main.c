@@ -86,8 +86,6 @@ void display7SEG(int num)
 	HAL_GPIO_WritePin(SEG6_GPIO_Port, SEG6_Pin, NUM[num][6]);
 }
 
-int status = 0;
-
 const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer[4] = {1, 2, 3, 4};
@@ -100,24 +98,28 @@ void update7SEG(int index)
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_SET);
+			display7SEG(led_buffer[index - 1]);
 			break;
 		case 2:
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_SET);
+			display7SEG(led_buffer[index - 1]);
 			break;
 		case 3:
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_SET);
+			display7SEG(led_buffer[index - 1]);
 			break;
 		case 4:
 			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_RESET);
+			display7SEG(led_buffer[index - 1]);
 			break;
 		default:
 			break;
@@ -156,9 +158,9 @@ int main(void)
 	MX_GPIO_Init();
 	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
-	setTimer(0, 50);
+	setTimer(0, 25);
 	HAL_TIM_Base_Start_IT(&htim2);
-
+	index_led = 1;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -167,16 +169,15 @@ int main(void)
 	{
 	/* USER CODE END WHILE */
 
-	  update7SEG(led_buffer[status]);
-	  display7SEG(led_buffer[status]);
+	  update7SEG(index_led);
 	  if (getTimerFlag(0))
 	  {
-		  status++;
-		  if (status > 3)
+		  index_led++;
+		  if (index_led > 4)
 		  {
-			  status = 0;
+			  index_led = 1;
 		  }
-		  setTimer(0, 50);
+		  setTimer(0, 25);
 	  }
 	/* USER CODE BEGIN 3 */
 	}
