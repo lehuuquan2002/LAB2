@@ -90,6 +90,8 @@ const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer[4] = {1, 2, 3, 4};
 
+int status_dot = 0;
+
 void update7SEG(int index)
 {
 	switch (index) {
@@ -159,6 +161,7 @@ int main(void)
 	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
 	setTimer(0, 25);
+	setTimer(1, 100);
 	HAL_TIM_Base_Start_IT(&htim2);
 	index_led = 1;
 	/* USER CODE END 2 */
@@ -170,6 +173,7 @@ int main(void)
 	/* USER CODE END WHILE */
 
 	  update7SEG(index_led);
+	  HAL_GPIO_WritePin(DOT_GPIO_Port, DOT_Pin, status_dot);
 	  if (getTimerFlag(0))
 	  {
 		  index_led++;
@@ -178,6 +182,12 @@ int main(void)
 			  index_led = 1;
 		  }
 		  setTimer(0, 25);
+	  }
+
+	  if (getTimerFlag(1))
+	  {
+		  status_dot = !status_dot;
+		  setTimer(1, 100);
 	  }
 	/* USER CODE BEGIN 3 */
 	}
