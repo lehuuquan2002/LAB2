@@ -86,7 +86,7 @@ void display7SEG(int num)
 	HAL_GPIO_WritePin(SEG6_GPIO_Port, SEG6_Pin, NUM[num][6]);
 }
 
-int status = 0;
+int status = 4;
 
 /* USER CODE END 0 */
 
@@ -96,58 +96,83 @@ int status = 0;
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
+	/* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_TIM2_Init();
-  /* USER CODE BEGIN 2 */
-  setTimer(0, 100);
-  HAL_TIM_Base_Start_IT(&htim2);
-  /* USER CODE END 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_TIM2_Init();
+	/* USER CODE BEGIN 2 */
+	setTimer(0, 50);
+	HAL_TIM_Base_Start_IT(&htim2);
+	/* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-	  if (status)
-	  {
-		  display7SEG(2);
-	  }else{
-		  display7SEG(1);
-	  }
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	while (1)
+	{
+	/* USER CODE END WHILE */
 
-	  HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, status);
-	  HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, !status);
-
+	  switch (status) {
+		case 1:
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_SET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_SET);
+			break;
+		case 3:
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_SET);
+			break;
+		case 4:
+			HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_RESET);
+			break;
+		default:
+			break;
+	}
+	  display7SEG(status);
 	  if (getTimerFlag(0))
 	  {
-		  status = !status;
-		  setTimer(0, 100);
+		  status++;
+		  if (status > 4)
+		  {
+			  status = 1;
+		  }
+		  setTimer(0, 50);
 	  }
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+	/* USER CODE BEGIN 3 */
+	}
+	/* USER CODE END 3 */
 }
+
 
 /**
   * @brief System Clock Configuration
@@ -246,14 +271,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED_Pin|EN0_Pin|EN1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, DOT_Pin|LED_Pin|EN0_Pin|EN1_Pin
+                          |EN2_Pin|EN3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SEG0_Pin|SEG1_Pin|SEG2_Pin|SEG3_Pin
                           |SEG4_Pin|SEG5_Pin|SEG6_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED_Pin EN0_Pin EN1_Pin */
-  GPIO_InitStruct.Pin = LED_Pin|EN0_Pin|EN1_Pin;
+  /*Configure GPIO pins : DOT_Pin LED_Pin EN0_Pin EN1_Pin
+                           EN2_Pin EN3_Pin */
+  GPIO_InitStruct.Pin = DOT_Pin|LED_Pin|EN0_Pin|EN1_Pin
+                          |EN2_Pin|EN3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
