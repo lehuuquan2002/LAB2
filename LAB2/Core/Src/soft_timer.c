@@ -8,13 +8,14 @@
 
 #include <soft_timer.h>
 
+#define TIMER_CYCLE 			10
 
 int timer_counter[10] = {0};
 int timer_flag[10] = {0};
 
-void setTimer(int pos, int count)
+void setTimer(int pos, int duration)
 {
-	timer_counter[pos] = count;
+	timer_counter[pos] = duration/TIMER_CYCLE;
 	timer_flag[pos] = 0;
 }
 
