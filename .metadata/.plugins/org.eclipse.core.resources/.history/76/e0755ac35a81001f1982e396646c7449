@@ -196,20 +196,8 @@ void updateLEDMatrix(int index)
 	default:
 		break;
 	}
-}
 
-void animationLEDMatrix(void)
-{
-	uint8_t temp = 0;
-	temp = matrix_buffer[0];
-	matrix_buffer[0] = matrix_buffer[1];
-	matrix_buffer[1] = matrix_buffer[2];
-	matrix_buffer[2] = matrix_buffer[3];
-	matrix_buffer[3] = matrix_buffer[4];
-	matrix_buffer[4] = matrix_buffer[5];
-	matrix_buffer[5] = matrix_buffer[6];
-	matrix_buffer[6] = matrix_buffer[7];
-	matrix_buffer[7] = temp;
+
 }
 
 /* USER CODE END 0 */
@@ -248,7 +236,6 @@ int main(void)
 	setTimer(0, 1000);
 	setTimer(1, 250);
 	setTimer(2, 10);
-	setTimer(3, 1000);
 	HAL_TIM_Base_Start_IT(&htim2);
 
 	/* USER CODE END 2 */
@@ -307,11 +294,6 @@ int main(void)
 		  setTimer(2, 10);
 	  }
 
-	  if (getTimerFlag(3))
-	  {
-		  animationLEDMatrix();
-		  setTimer(3, 1000);
-	  }
 
 	/* USER CODE BEGIN 3 */
 	}
